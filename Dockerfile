@@ -30,7 +30,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Create necessary directories
 WORKDIR /opt
-RUN wget http://volt0/kits/released/voltdb-8.0/voltdb-ent-8.0.tar.gz
+RUN wget http://downloads.voltdb.com/technologies/server/voltdb-ent-8.0.tar.gz
 RUN tar -xf voltdb-ent-8.0.tar.gz
 RUN ln -sf `tar -tvf voltdb-ent-8.0.tar.gz | head -1 | xargs | cut -d\  -f 6 | cut -d\/ -f 1` voltdb
 RUN rm -f voltdb-ent-8.0.tar.gz
