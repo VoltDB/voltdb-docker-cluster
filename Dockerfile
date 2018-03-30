@@ -29,5 +29,18 @@ ENV TZ=America/New_York
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # Create necessary directories
-RUN mkdir -p $VOLTDB_DIST
-WORKDIR $VOLTDB_DIST
+WORKDIR /opt
+RUN wget http://volt0/kits/released/voltdb-8.0/voltdb-ent-8.0.tar.gz
+RUN tar -xf voltdb-ent-8.0.tar.gz
+RUN ln -sf `tar -tvf voltdb-ent-8.0.tar.gz | head -1 | xargs | cut -d\  -f 6 | cut -d\/ -f 1` voltdb
+RUN rm -f voltdb-ent-8.0.tar.gz
+ENV VOLTDBROOT=/tmp/voltdbroot
+ENV HOSTCOUNT=1
+ENV DEPLOY=deployment.xml
+#ENV REPLICA=
+RUN mkdir -p $VOLTDBROOT
+WORKDIR $VOLTDBROOT
+RUN echo '<deployment><cluster hostcount="1" sitesperhost="2" kfactor="0" schema="ddl"/><partition-detection enabled="false"/><httpd enabled="true"><jsonapi enabled="true"/></httpd><dr id="1" listen="true"></dr></deployment>' > deployment.xml
+RUN voltdb init -C deployment.xml
+# localhost hardcoded for testing
+ENTRYPOINT voltdb start $REPLICA -H localhost -l /opt/voltdb/voltdb/license.xml -c $HOSTCOUNT $VOLT_ARGS
